@@ -3,15 +3,19 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import rootRouter from './routes/root.js' // Import the router
 import dotenv from "dotenv"
-import { logger } from './middleware/logger.js'
+import { logger,logEvents } from './middleware/logger.js'
 import {errorHandler} from "./middleware/errorHandler.js"
 import cookieParser from 'cookie-parser'
 import cors from "cors"
 import { corsOptions } from './config/corsOptions.js'
+import { connectDB } from './config/dbConn.js'
+
+
 
 // Initialize dotenv to load environment variables
 dotenv.config()
 const app = express()
+connectDB()
 
 //Logger
 app.use(logger)
@@ -26,6 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 // Use the router for handling specific routes
 app.use('/', rootRouter)
 
+//built in middleware
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors(corsOptions))
@@ -47,4 +52,5 @@ app.all('*', (req, res) => {
 app.use(errorHandler)
 // Start the server
 const PORT = process.env.PORT || 3500
+
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
